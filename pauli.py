@@ -1,1 +1,0 @@
-print("Pauli la mejor")
