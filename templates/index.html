@@ -4,11 +4,25 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hi</title>
+    <title>MBTA Stop Finder</title>
   </head>
 
   <body>
-    <h1>Hi</h1>
-    <p>This is an amazing app to help you find the nearest MBTA station</p>
+    <h1>Find the Nearest MBTA Stop</h1>
+    <form method="POST">
+      <input type="text" name="place" placeholder="Enter a location" required>
+      <button type="submit">Find Stop</button>
+    </form>
+
+    {% if result %}
+      {% if result.error %}
+        <p>{{ result.error }} </p>
+      {% else %}
+        <p>Location: {{ result.place }}</p>
+        <p>Nearest Stop: {{ result.station }}</p>
+        <p>Wheelchair Accessible: {{ result.accessible }}</p>
+      {% endif %}
+    {% endif %}
+
   </body>
 </html>
