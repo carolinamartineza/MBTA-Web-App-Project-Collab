@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import urllib.request
 import urllib.parse
 import json
+from urllib.parse import quote
 
 # Load environment variables
 load_dotenv()
@@ -27,6 +28,7 @@ def get_json(url: str) -> dict:
         data = response.read()
         return json.loads(data)
 
+
 def get_lat_lng(place_name: str) -> tuple[str, str]:
     """
     Given a place name or address, return a (latitude, longitude) tuple with the coordinates of the given place.
@@ -34,15 +36,16 @@ def get_lat_lng(place_name: str) -> tuple[str, str]:
     See https://docs.mapbox.com/api/search/geocoding/ for Mapbox Geocoding API URL formatting requirements.
     """
     place_encoded = urllib.parse.quote(place_name)
-    url = f"{MAPBOX_BASE_URL}/{place_encoded}.json?access_token={MAPBOX_TOKEN}"
+    url = build_mapbox_url(place_name)
     data = get_json(url)
-    
+
     try:
-        coordinates = data['features'][0]['geometry']['coordinates']
+        coordinates = data["features"][0]["geometry"]["coordinates"]
         longitude, latitude = coordinates
         return str(latitude), str(longitude)
     except (IndexError, KeyError):
         return None
+
 
 def get_nearest_station(latitude: str, longitude: str) -> tuple[str, bool]:
     """
@@ -50,17 +53,25 @@ def get_nearest_station(latitude: str, longitude: str) -> tuple[str, bool]:
 
     See https://api-v3.mbta.com/docs/swagger/index.html#/Stop/ApiWeb_StopController_index for URL formatting requirements for the 'GET /stops' API.
     """
-    url = f"{MBTA_BASE_URL}?api_key={MBTA_API_KEY}&filter[latitude]={latitude}&filter[longitude]={longitude}&sort=distance"
+    url = (
+    f"{MBTA_BASE_URL}?"
+    f"api_key={MBTA_API_KEY}"
+    f"&filter[latitude]={latitude}"
+    f"&filter[longitude]={longitude}"
+    f"&sort=distance"
+    )
+
     data = get_json(url)
-    
+
     try:
-        stop = data['data'][0]['attributes']
-        station_name = stop['name']
-        wheelchair_accessible = stop['wheelchair_boarding'] == 1
+        stop = data["data"][0]["attributes"]
+        station_name = stop["name"]
+        wheelchair_accessible = stop["wheelchair_boarding"] == 1
         return station_name, wheelchair_accessible
     except (IndexError, KeyError):
         return None
-    
+
+
 def find_stop_near(place_name: str) -> tuple[str, bool]:
     """
     Given a place name or address, return the nearest MBTA stop and whether it is wheelchair accessible.
@@ -70,19 +81,47 @@ def find_stop_near(place_name: str) -> tuple[str, bool]:
     location = get_lat_lng(place_name)
     if not location:
         return None
-    latitude, longitude = location
-    return get_nearest_station(latitude, longitude)
     
+    latitude, longitude = location
+
+    station_info = get_nearest_station(str(latitude), str(longitude))
+    if not station_info:
+        return None
+    
+    station_name, accessible = station_info
+    return station_name, accessible, latitude, longitude
+
+def build_mapbox_url(place_name: str) -> str:
+    """Returns a full URL for querying the Mapbox Geocoding API with the given place name"""
+    encoded_place = quote(place_name)
+    return f"{MAPBOX_BASE_URL}/{encoded_place}.json?access_token={MAPBOX_TOKEN}"
+
+
 def main():
     """
     You should test all the above functions here
     """
-    place = "Fenway Park"
+    latitude = "42.3601"
+    longitude = "-71.0589"
+
+    print("Testing get_nearest_station with Boston coordinates:")
+    result = get_nearest_station(latitude, longitude)
+    if result:
+        station, accessible = result
+        print(f"Nearest stop: {station} | Wheelchair Accessible: {'Yes' if accessible else 'No'}")
+    else:
+        print("No nearby station found.")
+
+    print("Testing build_mapbox_url:")
+    print(build_mapbox_url(place))
+
     result = find_stop_near(place)
     if result:
         station, accessible = result
         access_text = "is" if accessible else "is NOT"
-        print(f"The nearest MBTA stop to '{place}' is '{station}' and it {access_text} wheelchair accessible.")
+        print(
+            f"The nearest MBTA stop to '{place}' is '{station}' and it {access_text} wheelchair accessible."
+        )
     else:
         print("Could not find a nearby stop.")
 
