@@ -1,6 +1,8 @@
 import os
-
 from dotenv import load_dotenv
+import urllib.request
+import urllib.parse
+import json
 
 # Load environment variables
 load_dotenv()
@@ -21,8 +23,9 @@ def get_json(url: str) -> dict:
 
     Both get_lat_lng() and get_nearest_station() might need to use this function.
     """
-    pass
-
+    with urllib.request.urlopen(url) as response:
+        data = response.read()
+        return json.loads(data)
 
 def get_lat_lng(place_name: str) -> tuple[str, str]:
     """
@@ -30,8 +33,16 @@ def get_lat_lng(place_name: str) -> tuple[str, str]:
 
     See https://docs.mapbox.com/api/search/geocoding/ for Mapbox Geocoding API URL formatting requirements.
     """
-    pass
-
+    place_encoded = urllib.parse.quote(place_name)
+    url = f"{MAPBOX_BASE_URL}/{place_encoded}.json?access_token={MAPBOX_TOKEN}"
+    data = get_json(url)
+    
+    try:
+        coordinates = data['features'][0]['geometry']['coordinates']
+        longitude, latitude = coordinates
+        return str(latitude), str(longitude)
+    except (IndexError, KeyError):
+        return None
 
 def get_nearest_station(latitude: str, longitude: str) -> tuple[str, bool]:
     """
@@ -39,24 +50,41 @@ def get_nearest_station(latitude: str, longitude: str) -> tuple[str, bool]:
 
     See https://api-v3.mbta.com/docs/swagger/index.html#/Stop/ApiWeb_StopController_index for URL formatting requirements for the 'GET /stops' API.
     """
-    pass
-
-
+    url = f"{MBTA_BASE_URL}?api_key={MBTA_API_KEY}&filter[latitude]={latitude}&filter[longitude]={longitude}&sort=distance"
+    data = get_json(url)
+    
+    try:
+        stop = data['data'][0]['attributes']
+        station_name = stop['name']
+        wheelchair_accessible = stop['wheelchair_boarding'] == 1
+        return station_name, wheelchair_accessible
+    except (IndexError, KeyError):
+        return None
+    
 def find_stop_near(place_name: str) -> tuple[str, bool]:
     """
     Given a place name or address, return the nearest MBTA stop and whether it is wheelchair accessible.
 
     This function might use all the functions above.
     """
-    pass
-
-
+    location = get_lat_lng(place_name)
+    if not location:
+        return None
+    latitude, longitude = location
+    return get_nearest_station(latitude, longitude)
+    
 def main():
     """
     You should test all the above functions here
     """
-    pass
-
+    place = "Fenway Park"
+    result = find_stop_near(place)
+    if result:
+        station, accessible = result
+        access_text = "is" if accessible else "is NOT"
+        print(f"The nearest MBTA stop to '{place}' is '{station}' and it {access_text} wheelchair accessible.")
+    else:
+        print("Could not find a nearby stop.")
 
 if __name__ == "__main__":
     main()
