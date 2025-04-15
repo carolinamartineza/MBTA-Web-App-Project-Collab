@@ -11,7 +11,7 @@ This project is a Flask-based applications that allows users to imput their desi
 - An interactive map to visualize location
 - SQLite database that stores each search
 
-###Beyond base functionality, the project was extended with:
+### Beyond base functionality, the project was extended with:
 - A /history route to display a searchable log of all user queries
 - Custom styling using CSS
 - Modular code structure
