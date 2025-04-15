@@ -1,5 +1,8 @@
 # MBTA-Web-App-Project Reflection
 
+#### Team Members:
+Carolina Martinez Aparicio & Paulina M. Vasconez
+
 ## Project Overview
 
 This project is a Flask-based applications that allows users to imput their desired location in the Boston area and hel them find the nearest MBTA stop. The main ojective was to integrate web APIs and build user friendly tool that converts a place name into coordinates using Mapbox Geocoding API, then queries the MBTA API to identify the closest stop and whether it is wheelchair accessible.
