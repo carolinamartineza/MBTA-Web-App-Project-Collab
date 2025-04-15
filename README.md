@@ -4,14 +4,14 @@
 
 This project is a Flask-based applications that allows users to imput their desired location in the Boston area and hel them find the nearest MBTA stop. The main ojective was to integrate web APIs and build user friendly tool that converts a place name into coordinates using Mapbox Geocoding API, then queries the MBTA API to identify the closest stop and whether it is wheelchair accessible.
 
-### Key features:
+#### Key features:
 - Dynamic form-based front end that accepts user input.
 - Integrates real time web APIs
 - Clean and fun display
 - An interactive map to visualize location
 - SQLite database that stores each search
 
-### Beyond base functionality, the project was extended with:
+#### Beyond base functionality, the project was extended with:
 - A /history route to display a searchable log of all user queries
 - Custom styling using CSS
 - Modular code structure
