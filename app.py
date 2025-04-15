@@ -18,7 +18,7 @@ def index():
             }
         else:
             result = {"error": "Could not find a nearby station."}
-        return render_template("index.html", result=result)
+    return render_template("index.html", result=result)
 
 if __name__ == "__main__":
     app.run(debug=True)
