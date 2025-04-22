@@ -52,7 +52,7 @@ def history():
 
     conn.close()
 
-    return render_template("history,html", searches=rows)
+    return render_template("history.html", searches=rows)
 
 
 if __name__ == "__main__":
