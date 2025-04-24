@@ -20,6 +20,13 @@ This project is a Flask-based applications that allows users to imput their desi
 - Modular code structure
 - Dynamic map
 
+#### Important instructions for running code:
+- API keys are the following ones:
+MAPBOX_TOKEN=pk.eyJ1IjoicGF1bGluYXZhc2NvbmV6byIsImEiOiJjbTlpbjUxb3EwMjZlMmxwbmo0Z2ZieDNmIn0.W9C5xhTbZwOF8nqeVIvWyg
+MBTA_API_KEY=7c0dba3e93924b399da29dc8c4a079c2
+
+- When looking for the location add ",Boston" at the end. For example, if looking for Fenway Park type "Fenway Park, Boston"
+
 ## Reflection
 
 ### Development Process
